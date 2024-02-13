@@ -1,0 +1,53 @@
+/* Style the editor container */
+.CodeMirror {
+    border: 1px solid #ccc;
+    height: 100%; /* Set initial height to one line */
+    font-size: 24px; /* Increase font size to 24px */
+  }
+  
+  /* Style the editor content */
+  .CodeMirror-scroll {
+    overflow: auto;
+    height: auto; /* Allow content to determine height */
+  }
+  
+  /* Style the line numbers */
+  .CodeMirror-linenumber {
+    padding: 0 8px;
+    color: #999;
+  }
+  
+  /* Style the selection */
+  .CodeMirror-selected {
+    background: #d9d9d9;
+  }
+  
+  /* Style the cursor */
+  .CodeMirror-cursor {
+    border-left: 2px solid black;
+  }
+  
+  /* Style the text */
+  .CodeMirror pre {
+    padding: 0 8px;
+  }
+  
+  /* Style the gutter (line numbers area) */
+  .CodeMirror-gutters {
+    background-color: #f7f7f7;
+    border-right: 1px solid #ddd;
+  }
+  
+  /* Style specific tokens */
+  .cm-keyword {
+    color: blue;
+  }
+  
+  .cm-comment {
+    color: green;
+  }
+  
+  .cm-string {
+    color: red;
+  }
+  
