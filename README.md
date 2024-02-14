@@ -1,6 +1,7 @@
 
 # Project Live
-[@Live](https://liveeditlab.onrender.com/);
+
+[@Live](https://liveeditlab.onrender.com/){:target="_blank"};
 
 
 # React + Vite
