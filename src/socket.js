@@ -1,16 +1,12 @@
-import Ably from 'ably';
+import { io } from 'socket.io-client';
 
 export const initSocket = async () => {
-    const ably = new Ably.Realtime.Promise({ key: ABLY_API_KEY });
-    const channel = ably.channels.get('room');
+    const options = {
+        'force new connection': true,
+        reconnectionAttempts: 'Infinity',
+        timeout: 10000,
+        transports: ['websocket']
+    };
 
-    return new Promise((resolve, reject) => {
-        channel.attach((err) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(channel);
-            }
-        });
-    });
+    return io(process.env.REACT_APP_BACKEND_URL, options);
 };
