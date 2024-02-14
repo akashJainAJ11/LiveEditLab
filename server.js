@@ -1,72 +1,50 @@
 import express from 'express';
 import http from 'http';
-import { Server } from 'socket.io';
-import ACTIONS from './src/Actions.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import { Server } from 'socket.io';
+import Ably from 'ably';
+import dotenv from 'dotenv';
 
+dotenv.config(); // Load environment variables from .env file
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-
 app.use(express.static('dist'));
-app.use((req,res, next) => {
+app.use((req, res, next) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-})
+});
 
-
-const userSocketMap = {};
-
-function getAllConnectedClients (roomId){
-     return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map( 
-        (socketId) => {
-        return {
-            socketId,
-            username: userSocketMap[socketId]
-        }
-     });
-}
+const ably = new Ably.Realtime(process.env.ABLY_API_KEY); // Access API key from environment variable
 
 io.on('connection', (socket) => {
     console.log('socket connected', socket.id);
 
-    socket.on(ACTIONS.JOIN, ({roomId, username}) => {
-        userSocketMap[socket.id] = username;
-        socket.join(roomId);
-        const clients = getAllConnectedClients(roomId);
-        console.log(clients);
-        clients.forEach( ({socketId}) => {
-            io.to(socketId).emit(ACTIONS.JOINED, {
-                clients,
-                username,
-                socketId: socket.id,
-            })
-        })
-    })
-
-    socket.on(ACTIONS.CODE_CHANGE, ({roomId, code}) => {
-        socket.in(roomId).emit(ACTIONS.CODE_CHANGE, {code});
-    })
-
-    socket.on(ACTIONS.SYNC_CODE, ({socketId, code}) => {
-        io.to(socketId).emit(ACTIONS.CODE_CHANGE, {code});
-    })
-
     socket.on('disconnecting', () => {
         const rooms = [...socket.rooms];
-        rooms.forEach((roomId)=>{
-            socket.in(roomId).emit(ACTIONS.DISCONNECTED, {
-                socketId: socket.id,
-                username: userSocketMap[socket.id]
-            })
-        })
-        delete userSocketMap[socket.id];
-        socket.leave();
-    })
-});
+        rooms.forEach((roomId) => {
+            socket.in(roomId).emit('disconnect');
+        });
+    });
 
+    socket.on('JOIN', ({ roomId, username }) => {
+        socket.join(roomId);
+        const channel = ably.channels.get(roomId);
+        channel.presence.enter({ clientId: socket.id, data: username });
+    });
+
+    socket.on('CODE_CHANGE', ({ roomId, code }) => {
+        socket.in(roomId).emit('CODE_CHANGE', { code });
+    });
+
+    socket.on('SYNC_CODE', ({ socketId, code }) => {
+        const channel = ably.channels.get(socketId);
+        channel.publish('CODE_CHANGE', { code });
+    });
+});
 
 const PORT = process.env.PORT || 5000;
 
