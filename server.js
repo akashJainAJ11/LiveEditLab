@@ -4,9 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { Server } from 'socket.io';
 import Ably from 'ably';
-import dotenv from 'dotenv';
 
-dotenv.config(); // Load environment variables from .env file
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -18,7 +16,7 @@ app.use((req, res, next) => {
     res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
-const ably = new Ably.Realtime(process.env.ABLY_API_KEY); // Access API key from environment variable
+const ably = new Ably.Realtime(ABLY_API_KEY); // Access API key from environment variable
 
 io.on('connection', (socket) => {
     console.log('socket connected', socket.id);
