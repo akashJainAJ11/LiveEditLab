@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start":"npm run build && node server.js",
+    "start": "npm run build && node server.js",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.23.9",
+    "ably": "^1.2.49",
     "codemirror": "^5.65.16",
     "core-js-pure": "^3.35.1",
     "dotenv": "^16.4.3",
